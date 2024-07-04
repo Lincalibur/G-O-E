@@ -11,3 +11,21 @@
 # The process will then take the Criteria on the Text file and make a new sheet for each criteria within one excel sheet.
 # The Process will then execute the Criteria as filters on the appropriate columns for each sheet.
 # Once the Entire process is complete everything is saved in one excel file called "applied_criteria"
+import pandas as pd
+import os
+
+def apply_criteria(file_path, criteria_file_path, output_path):
+    with open(criteria_file_path, 'r') as f:
+        criteria = f.readlines()
+    
+    df = pd.read_excel(file_path)
+    writer = pd.ExcelWriter(output_path, engine='xlsxwriter')
+    
+    for i, criterion in enumerate(criteria):
+        column, condition = criterion.strip().split(' looking for ')
+        df_filtered = df.query(f'{column} {condition}')
+        df_filtered.to_excel(writer, sheet_name=f'Criteria_{i+1}', index=False)
+    
+    writer.save()
+    os.remove(criteria_file_path)
+    print(f"Applied criteria and saved to {output_path}")

@@ -8,7 +8,7 @@ from src.Operations.compare_and_find_matching import compare_and_find_matching
 # from src.Operations.compare_and_find_missing import compare_and_find_missing
 # from src.Operations.remove_duplicates import remove_duplicates
 # from src.Operations.sort_count_summarize import sort_count_summarize
-# from src.Operations.look_for_lines_meeting_criteria import look_for_lines_meeting_criteria
+from src.gui_criteria import CriteriaGUI
 
 # Function to select files
 def select_files(entry_widget):
@@ -54,13 +54,13 @@ class GodExcelApp(ctk.CTk):
         # File Entry and Button
         self.file_entry = ctk.CTkEntry(self.main_frame, width=400)
         self.file_entry.grid(row=0, column=0, pady=10, padx=10)
-        self.file_button = ctk.CTkButton(self.main_frame, text="Select missing list", command=lambda: select_files(self.file_entry))
+        self.file_button = ctk.CTkButton(self.main_frame, text="Select File", command=lambda: select_files(self.file_entry))
         self.file_button.grid(row=0, column=1, pady=10, padx=10)
 
         # Directory Entry and Button
         self.dir_entry = ctk.CTkEntry(self.main_frame, width=400)
         self.dir_entry.grid(row=1, column=0, pady=10, padx=10)
-        self.dir_button = ctk.CTkButton(self.main_frame, text="Select search_bucket", command=lambda: select_directory(self.dir_entry))
+        self.dir_button = ctk.CTkButton(self.main_frame, text="Select Directory", command=lambda: select_directory(self.dir_entry))
         self.dir_button.grid(row=1, column=1, pady=10, padx=10)
 
         # Execute Button
@@ -81,6 +81,9 @@ class GodExcelApp(ctk.CTk):
                     found_imei_path=os.path.join(directory_path, 'Found_IMEI.xlsx'),
                     not_found_path=os.path.join(directory_path, 'Not_Found.xlsx')
                 )
+            elif self.toggle_criteria.get():
+                criteria_window = CriteriaGUI(self, file_path)
+                criteria_window.grab_set()
 
             # Add similar blocks for other operations here...
 
