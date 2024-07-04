@@ -54,13 +54,13 @@ class GodExcelApp(ctk.CTk):
         # File Entry and Button
         self.file_entry = ctk.CTkEntry(self.main_frame, width=400)
         self.file_entry.grid(row=0, column=0, pady=10, padx=10)
-        self.file_button = ctk.CTkButton(self.main_frame, text="Select File", command=lambda: select_files(self.file_entry))
+        self.file_button = ctk.CTkButton(self.main_frame, text="Select missing list", command=lambda: select_files(self.file_entry))
         self.file_button.grid(row=0, column=1, pady=10, padx=10)
 
         # Directory Entry and Button
         self.dir_entry = ctk.CTkEntry(self.main_frame, width=400)
         self.dir_entry.grid(row=1, column=0, pady=10, padx=10)
-        self.dir_button = ctk.CTkButton(self.main_frame, text="Select Directory", command=lambda: select_directory(self.dir_entry))
+        self.dir_button = ctk.CTkButton(self.main_frame, text="Select search_bucket", command=lambda: select_directory(self.dir_entry))
         self.dir_button.grid(row=1, column=1, pady=10, padx=10)
 
         # Execute Button
