@@ -1,7 +1,3 @@
-Sure! Here’s a sample `README.md` for your project "GOE (God Of Excel)":
-
----
-
 # GOE (God Of Excel)
 
 GOE (God Of Excel) is a Python-based application designed to perform various operations on Excel files, including comparing, finding matches, removing duplicates, sorting, counting, summarizing, and more. The application features a user-friendly GUI built with CustomTkinter.
