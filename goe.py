@@ -1,8 +1,14 @@
 import customtkinter as ctk
 import tkinter as tk
 from tkinter import filedialog, messagebox
-import pandas as pd
 import os
+
+# Import operations
+from src.Operations.compare_and_find_matching import compare_and_find_matching
+# from src.Operations.compare_and_find_missing import compare_and_find_missing
+# from src.Operations.remove_duplicates import remove_duplicates
+# from src.Operations.sort_count_summarize import sort_count_summarize
+# from src.Operations.look_for_lines_meeting_criteria import look_for_lines_meeting_criteria
 
 # Function to select files
 def select_files(entry_widget):
@@ -11,21 +17,12 @@ def select_files(entry_widget):
         entry_widget.delete(0, tk.END)
         entry_widget.insert(0, ", ".join(files))
 
-# Compare and find matching entries
-def compare_and_find_matching(search_bucket_files, list_files):
-    matches = []
-    for search_file in search_bucket_files:
-        search_df = pd.read_excel(search_file)
-        for list_file in list_files:
-            list_df = pd.read_excel(list_file)
-            common = search_df.merge(list_df, how='inner')
-            matches.append(common)
-    if matches:
-        result = pd.concat(matches)
-        result.to_excel("data/matching_results.xlsx", index=False)
-        messagebox.showinfo("Success", "Matching entries found and saved to data/matching_results.xlsx")
-    else:
-        messagebox.showinfo("No Matches", "No matching entries found.")
+# Function to select a directory
+def select_directory(entry_widget):
+    directory = filedialog.askdirectory()
+    if directory:
+        entry_widget.delete(0, tk.END)
+        entry_widget.insert(0, directory)
 
 # Main Application Class
 class GodExcelApp(ctk.CTk):
@@ -53,48 +50,43 @@ class GodExcelApp(ctk.CTk):
         # Main Content Frame
         self.main_frame = ctk.CTkFrame(self)
         self.main_frame.grid(row=0, column=1, pady=10, padx=10, sticky="nsew")
-        self.grid_columnconfigure(1, weight=1)
 
-        # Search Bucket Files
-        self.label_search_bucket = ctk.CTkLabel(self.main_frame, text="Search Bucket Files:")
-        self.label_search_bucket.grid(row=0, column=0, pady=10, padx=10)
-        self.entry_search_bucket = ctk.CTkEntry(self.main_frame, width=400)
-        self.entry_search_bucket.grid(row=0, column=1, pady=10, padx=10)
-        self.button_search_bucket = ctk.CTkButton(self.main_frame, text="Browse", command=lambda: select_files(self.entry_search_bucket))
-        self.button_search_bucket.grid(row=0, column=2, pady=10, padx=10)
+        # File Entry and Button
+        self.file_entry = ctk.CTkEntry(self.main_frame, width=400)
+        self.file_entry.grid(row=0, column=0, pady=10, padx=10)
+        self.file_button = ctk.CTkButton(self.main_frame, text="Select File", command=lambda: select_files(self.file_entry))
+        self.file_button.grid(row=0, column=1, pady=10, padx=10)
 
-        # List Files
-        self.label_list_files = ctk.CTkLabel(self.main_frame, text="List Files:")
-        self.label_list_files.grid(row=1, column=0, pady=10, padx=10)
-        self.entry_list_files = ctk.CTkEntry(self.main_frame, width=400)
-        self.entry_list_files.grid(row=1, column=1, pady=10, padx=10)
-        self.button_list_files = ctk.CTkButton(self.main_frame, text="Browse", command=lambda: select_files(self.entry_list_files))
-        self.button_list_files.grid(row=1, column=2, pady=10, padx=10)
+        # Directory Entry and Button
+        self.dir_entry = ctk.CTkEntry(self.main_frame, width=400)
+        self.dir_entry.grid(row=1, column=0, pady=10, padx=10)
+        self.dir_button = ctk.CTkButton(self.main_frame, text="Select Directory", command=lambda: select_directory(self.dir_entry))
+        self.dir_button.grid(row=1, column=1, pady=10, padx=10)
 
-        # Run Button
-        self.button_run = ctk.CTkButton(self.main_frame, text="Run", command=self.run_script)
-        self.button_run.grid(row=2, column=0, columnspan=3, pady=20, padx=10)
+        # Execute Button
+        self.execute_button = ctk.CTkButton(self.main_frame, text="Execute", command=self.execute_operations)
+        self.execute_button.grid(row=2, column=0, columnspan=2, pady=10, padx=10)
 
-    def run_script(self):
-        search_bucket_files = self.entry_search_bucket.get().split(", ")
-        list_files = self.entry_list_files.get().split(", ")
-        
-        if not search_bucket_files or not list_files:
-            messagebox.showerror("Error", "Please specify files for both search bucket and list.")
-            return
-        
-        if self.toggle_match.get():
-            compare_and_find_matching(search_bucket_files, list_files)
-        if self.toggle_missing.get():
-            compare_and_find_missing(search_bucket_files, list_files)
-        if self.toggle_duplicates.get():
-            remove_duplicates(search_bucket_files)
-        if self.toggle_sort.get():
-            sort_count_summarize(search_bucket_files)
-        if self.toggle_criteria.get():
-            look_for_lines_meeting_criteria(search_bucket_files)
-        
-        messagebox.showinfo("Success", "Script executed successfully!")
+    def execute_operations(self):
+        try:
+            file_path = self.file_entry.get()
+            directory_path = self.dir_entry.get()
+            
+            if self.toggle_match.get():
+                compare_and_find_matching(
+                    missing_list_path=file_path, 
+                    tracking_folder_path=directory_path, 
+                    imei_folder_path=directory_path,
+                    found_tracking_path=os.path.join(directory_path, 'Found_Tracking.xlsx'),
+                    found_imei_path=os.path.join(directory_path, 'Found_IMEI.xlsx'),
+                    not_found_path=os.path.join(directory_path, 'Not_Found.xlsx')
+                )
+
+            # Add similar blocks for other operations here...
+
+            messagebox.showinfo("Success", "Operation completed successfully!")
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred: {e}")
 
 if __name__ == "__main__":
     app = GodExcelApp()
